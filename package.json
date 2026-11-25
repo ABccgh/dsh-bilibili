@@ -1,0 +1,48 @@
+{
+  "name": "@local/bilibili",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Bilibili integration for DeepSeek Harness: search, video, creator, comments, danmaku, ranking, bangumi, live, subtitles, QR sign-in with personal data, and video/audio download, plus rich tool cards, a settings page and a sidebar browsing panel",
+  "license": "MIT",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib/**/*.js",
+    "skills/**",
+    "docs",
+    "client.js",
+    "locale/*.json",
+    "icon.svg",
+    "cordis.patch.yml",
+    "README.md"
+  ],
+  "meta": {
+    "title": "Bilibili",
+    "description": "在 DeepSeek Harness 里全面接入 B 站：20 个 bili_* 工具覆盖搜索、视频与分P、UP 主、评论、弹幕、排行、热门、番剧、直播、字幕、播放地址与视频/音频下载；扫码登录后可读观看历史、收藏夹、关注与动态。含富卡片、设置页与侧栏「B 站」浏览面板。"
+  },
+  "scripts": {
+    "test": "node --test \"test/*.test.js\"",
+    "live": "node tools/live-check.mjs --public"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-conversation",
+        "@deepseek-ai/dsh-client-ui-settings",
+        "@deepseek-ai/dsh-client-ui-sidebar",
+        "@deepseek-ai/dsh-client-ui-layout"
+      ]
+    }
+  }
+}

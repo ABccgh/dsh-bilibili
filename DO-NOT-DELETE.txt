@@ -1,0 +1,7 @@
+# 本目录有意保留：它是 `D:\DSH workspace\dsh-bilibili` 的发布源，
+# 安装副本在 `%USERPROFILE%\dsh-bundles\bilibili`（由 plugin_manager install_bundle 创建）。
+#
+# 清理脚本/同步工具不要删除本文件：它是「这不是一个空目录/可回收目录」的标记。
+# 修改配置请改 cordis.patch.yml 并同步安装副本（node tools/sync-install.mjs），
+# 删插件请走 plugin_manager remove_bundle，再手动清理本目录。
+dsh-bilibili 0.1.0

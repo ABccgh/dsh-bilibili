@@ -1,0 +1,124 @@
+# dsh-bilibili —— B 站全面接入
+#
+# 本文件是 bundle 的 patch 层，插入两行：
+#   1) bilibili     全局工具行：任何会话都能用 20 个 bili_* 工具（+ 面板路由、技能、命令）。
+#   2) preset-bili  预设「B 站内容研究」：persona + 标准工具集；bili_* 工具来自上面的全局行。
+#
+# 生效方式（见 README）：仓库 → 同步到 %USERPROFILE%\dsh-bundles\bilibili → plugin_manager(install_bundle)。
+# 改 lib/ 代码需要重启 DSH；只改本文件的配置值则重载一次即可。
+- insert:
+    - id: bilibili
+      name: '@local/bilibili'
+      config:
+        cookieEnv: BILI_COOKIE
+        requestTimeoutMs: 15000
+        maxListedItems: 25
+        attachImages: true
+        downloadDir: ''
+        ffmpegPath: ''
+        maxDownloadMb: 2048
+        panelEnabled: true
+        publicRoute: true
+        cacheTtlMs: 60000
+        wbiCacheTtlMs: 3600000
+
+    - id: preset-bili
+      name: '@deepseek-ai/dsh-agent-preset'
+      config:
+        id: bili
+        name: B 站内容研究
+        description: 在 B 站里找视频、看详情/弹幕/字幕、查 UP 主与热门排行，登录后可读历史/收藏/关注/动态，并把视频或音频下载到本地；含风控排障与版权边界。
+        order: 7
+        plugins:
+          - id: persona
+            name: '@deepseek-ai/dsh-persona'
+            config:
+              prefix: |
+                你是 B 站（bilibili）内容研究员，通过 DSH 的 20 个 bili_* 工具访问 B 站公开数据、登录后的个人数据与视频/音频下载。
+
+                开工顺序：① 涉及登录态或个人数据时先 bili_status（不要猜）；② 找内容用 bili_search（视频/用户/番剧/直播/专栏），再 bili_video / bili_user 看详情；③ 需要评论、弹幕、字幕、排行、热门、番剧、直播时用对应工具；④ 下载前先确认用途、目标清晰度与预计体积。
+
+                硬规则：
+                - 只读为主：不点赞、不投币、不评论、不转发、不发布、不关注/取关；登录只用于读取个人数据与提高清晰度。
+                - 风控（BILI_RISK_CONTROL / -352 / -412 / -799）不要硬刷：按工具给出的提示降级或稍后重试，连续两次失败就停下来问用户。
+                - 未登录调用个人工具会返回 BILI_AUTH_REQUIRED：引导用户 bili_login start 扫码，或配置 BILI_COOKIE，不要自己编造数据。
+                - 下载仅限个人离线使用；把文件路径、大小、清晰度如实报给用户，不替用户决定是否公开传播。
+                - 字幕/弹幕/评论可能很长：用工具的分页与上限参数，不要把整页原文贴回给用户，先给摘要与代表条目。
+                - 中文回复；工具报错先读错误码（BILI_*）与 hint，再决定重试/降级/询问。
+                - 完成后汇报：用了哪些工具、拿到什么、产出文件路径、哪些项没验证。
+
+          - id: agent-instructions
+            name: '@deepseek-ai/dsh-agent-instructions'
+            config:
+              maxBytes: 65536
+          - id: time-context
+            name: '@deepseek-ai/dsh-time-context'
+          - id: tool-bash
+            name: '@deepseek-ai/dsh-tool-bash'
+            disabled: !!js process.platform === 'win32'
+          - id: tool-pwsh
+            name: '@deepseek-ai/dsh-tool-pwsh'
+            disabled: !!js process.platform !== 'win32'
+          - id: tool-fs
+            name: '@deepseek-ai/dsh-tool-fs'
+          - id: tool-fs-search
+            name: '@deepseek-ai/dsh-tool-fs-search'
+            config:
+              sampleOverCapGlobResults: false
+          - id: tool-jobs
+            name: '@deepseek-ai/dsh-tool-jobs'
+          - id: skill-filesystem
+            name: '@deepseek-ai/dsh-skill-filesystem'
+          - id: tool-skill
+            name: '@deepseek-ai/dsh-tool-skill'
+          - id: tool-todo
+            name: '@deepseek-ai/dsh-tool-todo'
+            config:
+              allowParallelInProgress: true
+          - id: tool-ask-user
+            name: '@deepseek-ai/dsh-tool-ask-user'
+          - id: tool-web
+            name: '@deepseek-ai/dsh-tool-web'
+            config:
+              fetch: true
+              searchTimeoutMs: 60000
+          - id: present
+            name: '@deepseek-ai/dsh-tool-present'
+          - id: planning
+            name: cordis:group
+            group: true
+            isolate:
+              planMode: true
+            config:
+              - id: plan-mode
+                name: '@deepseek-ai/dsh-plan-mode'
+                config:
+                  section: |
+                    You are in plan mode. Stay in plan mode until the user approves your plan through exit_plan_mode or switches the session mode. Imperative language to implement changes means plan the implementation, not execute it. A user's conversational agreement — including an answer confirming something you asked — approves nothing and does not end plan mode; fold the confirmed decision into the plan and submit it through exit_plan_mode.
+
+                    Explore first. Use non-mutating reads, searches, static analysis, and checks to ground the plan in the actual repository. Do not edit or write files, change configuration, run formatters or code generation that rewrites tracked files, commit, or otherwise carry out the plan. Prefer existing functions and patterns over new machinery.
+
+                    The tool catalog stays the same across modes for request-cache stability. These plan-mode rules override any later tool description or guidance that suggests using mutation tools; those tools remain listed to keep the tool catalog unchanged. Do not use todo_write to track this planning phase: it tracks implementation after an approved plan, while the plan itself belongs in exit_plan_mode.
+
+                    Resolve discoverable facts by inspection. Use ask_user_question only for user-owned choices or material ambiguity that inspection cannot answer. Do not ask the user where code lives or how current behavior works when you can find out.
+
+                    Make the plan decision-complete: state the goal and success criteria; group implementation changes by subsystem; identify public API, schema, and data-flow changes; cover edge cases, failure modes, tests, acceptance criteria, and explicit assumptions. Keep it concise enough to review but detailed enough that another engineer can implement it without making design decisions.
+
+                    When ready, call exit_plan_mode with the complete plan markdown, starting with a # title. Make exit_plan_mode the only and final tool call in that assistant response: it presents the plan for approval, and implementation begins only in a later step after approval. Do not paste the final plan as a plain reply or ask "should I proceed?" through prose or ask_user_question. If review rejects it, incorporate the feedback and present again. If the review channel is unavailable or aborted, stay in plan mode and ask the user to switch modes manually; do not proceed with implementation.
+          - id: compaction
+            name: cordis:group
+            group: true
+            isolate:
+              compaction: true
+              toolResultPruner: true
+            config:
+              - id: compaction-basic
+                name: '@deepseek-ai/dsh-compaction-basic'
+              - id: command-compact
+                name: '@deepseek-ai/dsh-command-compact'
+              - id: tool-result-pruner
+                name: '@deepseek-ai/dsh-compaction-tool-result-pruner'
+                config:
+                  thresholdChars: 8192
+                  headChars: 4096
+                  tailChars: 1024

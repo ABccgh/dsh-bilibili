@@ -1,0 +1,255 @@
+{
+  "meta": {
+    "title": "B 站",
+    "description": "在 DeepSeek Harness 里全面接入 B 站：20 个 bili_* 工具覆盖搜索、视频与分P、UP 主、评论、弹幕、排行、热门、热搜、番剧、直播、字幕、播放地址、扫码登录后的历史/收藏/关注/动态，以及视频/音频下载；10 张工具卡片、设置 →「B 站」、侧栏 B 站按钮打开的「热搜 / 搜索 / 详情」抽屉。面板路由只读公开数据，个人数据与下载只经工具。",
+    "detail": "docs/DETAIL.md"
+  },
+  "card": {
+    "preparing": "准备中",
+    "running": "执行中",
+    "failed": "失败",
+    "empty": "没有可显示的内容",
+    "parseFallback": "结构化结果解析失败，下面是原始文本。",
+    "expand": "展开",
+    "collapse": "收起",
+    "more": "还有 {n} 项未显示",
+    "page": "第 {n} 页",
+    "unknown": "未知",
+    "play": "播放",
+    "status": {
+      "title": "B 站状态",
+      "loggedIn": "已登录",
+      "loggedOut": "未登录",
+      "version": "插件版本",
+      "user": "账号",
+      "level": "等级",
+      "cookie": "Cookie",
+      "cookieConfigured": "已配置",
+      "cookieMissing": "未配置",
+      "cookieSource": "来源",
+      "wbi": "WBI 签名",
+      "wbiReady": "已缓存",
+      "wbiPending": "待获取",
+      "ffmpeg": "ffmpeg",
+      "ffmpegReady": "可用",
+      "ffmpegMissing": "未找到",
+      "downloadDir": "下载目录",
+      "panel": "浏览面板",
+      "panelEnabled": "已启用",
+      "panelDisabled": "未启用",
+      "panelRoute": "取数路由",
+      "panelRouteOff": "未注册（publicRoute=false）",
+      "hint": "登录态来自 BILI_COOKIE 凭据或 bili_login 扫码；面板只读取公开数据。"
+    },
+    "search": {
+      "title": "B 站搜索",
+      "keyword": "关键词",
+      "total": "结果数",
+      "type": "类型",
+      "typeVideo": "视频",
+      "typeUser": "UP 主",
+      "typeBangumi": "番剧",
+      "typeLive": "直播",
+      "typeArticle": "专栏",
+      "empty": "没有搜索到结果",
+      "more": "还有更多结果，用分页参数继续取。"
+    },
+    "video": {
+      "title": "视频详情",
+      "open": "在 B 站打开",
+      "bvid": "BV 号",
+      "owner": "UP 主",
+      "published": "发布",
+      "duration": "时长",
+      "view": "播放",
+      "danmaku": "弹幕",
+      "like": "点赞",
+      "coin": "投币",
+      "favorite": "收藏",
+      "share": "分享",
+      "reply": "评论",
+      "desc": "简介",
+      "parts": "分P",
+      "part": "P{n}",
+      "partTitle": "标题",
+      "tags": "标签",
+      "cover": "封面",
+      "playerNote": "内嵌播放器使用 B 站官方 iframe；登录态与清晰度以浏览器为准。"
+    },
+    "user": {
+      "title": "UP 主",
+      "mid": "UID",
+      "level": "等级",
+      "fans": "粉丝",
+      "sign": "签名",
+      "videos": "投稿",
+      "noVideos": "没有取到投稿"
+    },
+    "trend": {
+      "title": "排行榜",
+      "popularTitle": "热门",
+      "area": "分区",
+      "kind": "类型",
+      "weekly": "每周必看",
+      "rank": "排名",
+      "count": "条数",
+      "empty": "没有取到条目"
+    },
+    "hotwords": {
+      "title": "热搜",
+      "count": "条数",
+      "empty": "没有取到热搜"
+    },
+    "comments": {
+      "title": "评论",
+      "count": "评论总数",
+      "replyCount": "{n} 条回复",
+      "like": "赞",
+      "empty": "没有取到评论"
+    },
+    "danmaku": {
+      "title": "弹幕",
+      "count": "弹幕总数",
+      "sampled": "抽样条数",
+      "distribution": "每分钟分布",
+      "minute": "第 {n} 分钟",
+      "empty": "没有取到弹幕"
+    },
+    "login": {
+      "title": "扫码登录",
+      "stateWaiting": "等待扫码",
+      "stateScanned": "已扫码，等待确认",
+      "stateExpired": "二维码已过期",
+      "stateOk": "登录成功",
+      "message": "提示",
+      "qrcodeKey": "二维码 key",
+      "mid": "UID",
+      "code": "状态码",
+      "expire": "{n} 秒内有效",
+      "qrHint": "二维码图片随工具结果返回；用 B 站手机客户端扫码。",
+      "pollHint": "在对话里让 Agent 用 bili_login action=poll 查询结果。",
+      "cleared": "Cookie 已清除",
+      "loggedIn": "已登录",
+      "loggedOut": "未登录",
+      "user": "账号",
+      "tutorial": "扫码步骤：① 在对话里调用 bili_login action=start 生成二维码；② 打开 B 站手机客户端扫码并确认；③ 用 action=poll 查询，成功后 Cookie 写入凭据 BILI_COOKIE。",
+      "logoutHint": "用 bili_login action=logout 可清除已保存的 Cookie。"
+    }
+  },
+  "settings": {
+    "label": "B 站",
+    "title": "B 站接入",
+    "intro": "本插件把 B 站接到 DeepSeek Harness：20 个 bili_* 工具覆盖搜索、视频与分P、UP 主、评论、弹幕、排行、热门、番剧、直播、字幕、播放地址与视频/音频下载；登录后可读观看历史、收藏夹、关注与动态。含工具卡片、本设置页与侧栏「B 站」浏览面板。",
+    "login": {
+      "title": "登录与运行状态",
+      "loading": "正在读取 /status…",
+      "error": "读取状态失败",
+      "retry": "重试",
+      "loggedIn": "已登录",
+      "loggedOut": "未登录",
+      "user": "账号",
+      "level": "等级",
+      "version": "插件版本",
+      "cookie": "Cookie",
+      "cookieConfigured": "已配置",
+      "cookieMissing": "未配置",
+      "ffmpeg": "ffmpeg",
+      "ffmpegReady": "可用",
+      "ffmpegMissing": "未找到（下载只能拿到单路音/视频）",
+      "downloadDir": "下载目录",
+      "refreshHint": "本页只读：状态来自面板取数路由 /dsh-bilibili/api/status，刷新页面或点重试即可更新。"
+    },
+    "scan": {
+      "title": "扫码登录（三步）",
+      "step1": "1. 在对话里调用 bili_login，action=start（默认 action=status）：生成二维码，图片随工具结果返回。",
+      "step2": "2. 打开 B 站手机客户端「扫一扫」，扫码并在手机上确认登录。",
+      "step3": "3. 让 Agent 用 bili_login action=poll 查询结果；state=ok 后 Cookie 写入凭据 BILI_COOKIE，历史/收藏/关注/动态即可读取。",
+      "note": "退出登录用 bili_login action=logout；也可以直接在 profile 里配置 BILI_COOKIE 凭据，跳过扫码。插件不保存账号密码。"
+    },
+    "config": {
+      "title": "配置键",
+      "hint": "配置写在 profile 的 cordis.patch.yml（bilibili 行）里；改配置值后重载一次，改代码需要重启 DSH。",
+      "col": {
+        "key": "键",
+        "default": "默认",
+        "desc": "说明"
+      },
+      "keys": {
+        "cookieEnv": "Cookie 的凭据名（credentials ref / 环境变量名）；登录成功后按此名写入。",
+        "requestTimeoutMs": "单次 HTTP 请求超时毫秒数（1000–120000）。",
+        "maxListedItems": "列表类工具一次最多返回的条数（1–200）。",
+        "attachImages": "把封面、头像与登录二维码作为图片附件随工具结果返回；关闭后只返回链接与路径。",
+        "downloadDir": "下载根目录；留空时为 %USERPROFILE%/Downloads/dsh-bilibili。",
+        "ffmpegPath": "ffmpeg 可执行文件路径；留空时自动探测 PATH。",
+        "maxDownloadMb": "单个下载任务的体积上限（MiB，1–51200）。",
+        "panelEnabled": "注册侧栏「B 站」按钮与浏览面板。",
+        "publicRoute": "注册面板取数路由 /dsh-bilibili/api（只暴露公开数据）；关闭后面板不可用。",
+        "cacheTtlMs": "面板路由与工具响应的内存缓存时长毫秒数（1000–3600000）。",
+        "wbiCacheTtlMs": "WBI 签名密钥缓存时长毫秒数（60000–86400000）。"
+      },
+      "default": {
+        "empty": "空",
+        "on": "开",
+        "off": "关"
+      }
+    },
+    "limits": {
+      "title": "已知限制与版权提示",
+      "risk": "风控（BILI_RISK_CONTROL / -352 / -412 / -799）无法绕过：失败后按提示降级或稍后重试，不要连续硬刷。",
+      "auth": "未登录时个人数据工具返回 BILI_AUTH_REQUIRED；需要 bili_login start 扫码或配置 BILI_COOKIE。",
+      "rate": "面板只读公开接口，可能被 B 站短暂限流；Host 侧有 30 秒内存缓存，失败后稍等再刷新。",
+      "download": "下载依赖 ffmpeg 合并音视频；缺少 ffmpeg 时只能拿到纯视频或纯音频，且不能用于绕过付费/权限内容。",
+      "copyright": "下载内容仅限个人离线学习与备份，不要二次分发或用于商业用途；数据来自 B 站公开接口，请遵守 B 站用户协议。",
+      "panel": "本页只读展示状态与说明，不能修改配置；所有动作都要通过 bili_* 工具触发。面板不读取登录后的个人数据。"
+    },
+    "footer": "工具、参数与接口选择见仓库 docs/INTERNAL-CONTRACT.md；安装、排障与验证状态见 README。"
+  },
+  "panel": {
+    "title": "B 站面板",
+    "close": "关闭",
+    "refresh": "刷新",
+    "loading": "加载中…",
+    "empty": "没有数据",
+    "retry": "重试",
+    "error": "加载失败",
+    "login": {
+      "loggedIn": "已登录",
+      "loggedOut": "未登录",
+      "hint": "面板只读公开数据；登录请让 Agent 调用 bili_login action=start。"
+    },
+    "tab": {
+      "hot": "热搜",
+      "search": "搜索",
+      "detail": "详情"
+    },
+    "hot": {
+      "title": "B 站热搜",
+      "hint": "点一条热搜直接搜索。",
+      "empty": "暂时没有热搜"
+    },
+    "search": {
+      "title": "搜索视频",
+      "placeholder": "输入关键词，例如：黑神话 攻略",
+      "submit": "搜索",
+      "empty": "没有搜索结果"
+    },
+    "detail": {
+      "title": "视频详情",
+      "placeholder": "输入 BV 号，例如 BV1xx411c7mD",
+      "submit": "查看",
+      "empty": "还没有选择视频：从搜索结果点一条，或粘贴 BV 号。",
+      "bvid": "BV 号",
+      "play": "在 B 站打开",
+      "duration": "时长",
+      "published": "发布",
+      "owner": "UP 主",
+      "parts": "分P",
+      "views": "播放",
+      "invalidBvid": "BV 号格式不对（BV 开头加 10 位字符）"
+    },
+    "footer": {
+      "copyright": "数据来自 B 站公开接口，仅作个人浏览与研究；请遵守 B 站用户协议。",
+      "routeOff": "面板取数路由未注册（publicRoute=false），此面板不可用。"
+    }
+  }
+}

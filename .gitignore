@@ -1,0 +1,10 @@
+.git
+.node_modules/
+node_modules/
+*.log
+*.tmp
+*.part
+_scratch/
+.admin/
+test/fixtures/*.bin
+!test/fixtures/dm-seg.bin

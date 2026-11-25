@@ -1,0 +1,255 @@
+{
+  "meta": {
+    "title": "Bilibili",
+    "description": "Full Bilibili integration for DeepSeek Harness: 20 bili_* tools for search, videos and parts, creators, comments, danmaku, ranking, popular, trending searches, bangumi, live rooms, subtitles, play URLs, personal history/favorites/follows/dynamics after QR sign-in, and video/audio download; 10 tool cards, Settings → Bilibili, and a Trending / Search / Details drawer opened from the sidebar foot. The panel route reads public data only; personal data and downloads go through the tools.",
+    "detail": "docs/DETAIL.md"
+  },
+  "card": {
+    "preparing": "Preparing",
+    "running": "Running",
+    "failed": "Failed",
+    "empty": "Nothing to show",
+    "parseFallback": "The structured result could not be parsed; raw text follows.",
+    "expand": "Expand",
+    "collapse": "Collapse",
+    "more": "{n} more not shown",
+    "page": "Page {n}",
+    "unknown": "Unknown",
+    "play": "Play",
+    "status": {
+      "title": "Bilibili status",
+      "loggedIn": "Signed in",
+      "loggedOut": "Signed out",
+      "version": "Plugin version",
+      "user": "Account",
+      "level": "Level",
+      "cookie": "Cookie",
+      "cookieConfigured": "Configured",
+      "cookieMissing": "Not configured",
+      "cookieSource": "Source",
+      "wbi": "WBI signing",
+      "wbiReady": "Cached",
+      "wbiPending": "Not fetched yet",
+      "ffmpeg": "ffmpeg",
+      "ffmpegReady": "Available",
+      "ffmpegMissing": "Missing",
+      "downloadDir": "Download directory",
+      "panel": "Browsing panel",
+      "panelEnabled": "Enabled",
+      "panelDisabled": "Disabled",
+      "panelRoute": "Panel route",
+      "panelRouteOff": "Not registered (publicRoute=false)",
+      "hint": "Sign-in state comes from the BILI_COOKIE credential or bili_login QR sign-in; the panel only reads public data."
+    },
+    "search": {
+      "title": "Bilibili search",
+      "keyword": "Keyword",
+      "total": "Results",
+      "type": "Type",
+      "typeVideo": "Videos",
+      "typeUser": "Creators",
+      "typeBangumi": "Bangumi",
+      "typeLive": "Live",
+      "typeArticle": "Articles",
+      "empty": "No results found",
+      "more": "More results exist; continue with the page parameter."
+    },
+    "video": {
+      "title": "Video",
+      "open": "Open on Bilibili",
+      "bvid": "BV id",
+      "owner": "Creator",
+      "published": "Published",
+      "duration": "Duration",
+      "view": "Views",
+      "danmaku": "Danmaku",
+      "like": "Likes",
+      "coin": "Coins",
+      "favorite": "Favorites",
+      "share": "Shares",
+      "reply": "Comments",
+      "desc": "Description",
+      "parts": "Parts",
+      "part": "P{n}",
+      "partTitle": "Title",
+      "tags": "Tags",
+      "cover": "Cover",
+      "playerNote": "The embedded player uses the official Bilibili iframe; sign-in state and quality follow your browser."
+    },
+    "user": {
+      "title": "Creator",
+      "mid": "UID",
+      "level": "Level",
+      "fans": "Followers",
+      "sign": "Bio",
+      "videos": "Videos",
+      "noVideos": "No uploads returned"
+    },
+    "trend": {
+      "title": "Ranking",
+      "popularTitle": "Popular",
+      "area": "Area",
+      "kind": "Kind",
+      "weekly": "Weekly picks",
+      "rank": "Rank",
+      "count": "Count",
+      "empty": "No entries returned"
+    },
+    "hotwords": {
+      "title": "Trending searches",
+      "count": "Count",
+      "empty": "No trending searches returned"
+    },
+    "comments": {
+      "title": "Comments",
+      "count": "Total comments",
+      "replyCount": "{n} replies",
+      "like": "Likes",
+      "empty": "No comments returned"
+    },
+    "danmaku": {
+      "title": "Danmaku",
+      "count": "Total danmaku",
+      "sampled": "Sampled",
+      "distribution": "Per-minute distribution",
+      "minute": "Minute {n}",
+      "empty": "No danmaku returned"
+    },
+    "login": {
+      "title": "QR sign-in",
+      "stateWaiting": "Waiting for scan",
+      "stateScanned": "Scanned, waiting for confirmation",
+      "stateExpired": "QR code expired",
+      "stateOk": "Signed in",
+      "message": "Message",
+      "qrcodeKey": "QR code key",
+      "mid": "UID",
+      "code": "Status code",
+      "expire": "Valid for {n} seconds",
+      "qrHint": "The QR image returns with the tool result; scan it in the Bilibili mobile app.",
+      "pollHint": "Ask the agent to call bili_login with action=poll to check the result.",
+      "cleared": "Cookies cleared",
+      "loggedIn": "Signed in",
+      "loggedOut": "Signed out",
+      "user": "Account",
+      "tutorial": "Scan steps: 1) call bili_login with action=start in the conversation to generate a QR code; 2) scan and confirm it in the Bilibili mobile app; 3) poll with action=poll — once successful the cookie is written to the BILI_COOKIE credential.",
+      "logoutHint": "Call bili_login with action=logout to clear the saved cookie."
+    }
+  },
+  "settings": {
+    "label": "Bilibili",
+    "title": "Bilibili integration",
+    "intro": "This plugin connects Bilibili to DeepSeek Harness: 20 bili_* tools cover search, videos and parts, creators, comments, danmaku, ranking, popular, bangumi, live, subtitles, play URLs and video/audio download; after sign-in it reads watch history, favorites, follows and dynamics. It ships tool cards, this settings page and a Bilibili browsing panel at the sidebar foot.",
+    "login": {
+      "title": "Sign-in and runtime status",
+      "loading": "Reading /status…",
+      "error": "Failed to read status",
+      "retry": "Retry",
+      "loggedIn": "Signed in",
+      "loggedOut": "Signed out",
+      "user": "Account",
+      "level": "Level",
+      "version": "Plugin version",
+      "cookie": "Cookie",
+      "cookieConfigured": "Configured",
+      "cookieMissing": "Not configured",
+      "ffmpeg": "ffmpeg",
+      "ffmpegReady": "Available",
+      "ffmpegMissing": "Missing (downloads fall back to one media stream)",
+      "downloadDir": "Download directory",
+      "refreshHint": "This page is read-only: status comes from the panel route /dsh-bilibili/api/status; reload the page or press Retry to refresh."
+    },
+    "scan": {
+      "title": "QR sign-in in three steps",
+      "step1": "1. Call bili_login with action=start in the conversation (the default action is status): it generates a QR code and returns the image with the tool result.",
+      "step2": "2. Open Scan in the Bilibili mobile app, scan the code and confirm the sign-in on the phone.",
+      "step3": "3. Ask the agent to poll with bili_login action=poll; when state=ok the cookie is written to the BILI_COOKIE credential and history, favorites, follows and dynamics become readable.",
+      "note": "Sign out with bili_login action=logout, or configure the BILI_COOKIE credential directly in the profile to skip the QR flow. The plugin never stores an account password."
+    },
+    "config": {
+      "title": "Configuration keys",
+      "hint": "Configure the bilibili row in the profile's cordis.patch.yml. Configuration values apply after a reload; source code changes need a DSH restart.",
+      "col": {
+        "key": "Key",
+        "default": "Default",
+        "desc": "Description"
+      },
+      "keys": {
+        "cookieEnv": "Credential name (credentials ref / environment variable name) for the cookie; a successful sign-in writes to this name.",
+        "requestTimeoutMs": "Per-request HTTP timeout in milliseconds (1000-120000).",
+        "maxListedItems": "Maximum items a list tool returns per call (1-200).",
+        "attachImages": "Attach covers, avatars and the sign-in QR code to tool results as images; when off only links and paths return.",
+        "downloadDir": "Root download directory; empty uses %USERPROFILE%/Downloads/dsh-bilibili.",
+        "ffmpegPath": "Path to the ffmpeg executable; empty auto-detects from PATH.",
+        "maxDownloadMb": "Size cap for one download in MiB (1-51200).",
+        "panelEnabled": "Register the Bilibili button and browsing panel at the sidebar foot.",
+        "publicRoute": "Register the panel route /dsh-bilibili/api (public data only); when off the panel is unavailable.",
+        "cacheTtlMs": "In-memory cache lifetime for panel routes and tool responses in milliseconds (1000-3600000).",
+        "wbiCacheTtlMs": "Cache lifetime for WBI signing keys in milliseconds (60000-86400000)."
+      },
+      "default": {
+        "empty": "empty",
+        "on": "on",
+        "off": "off"
+      }
+    },
+    "limits": {
+      "title": "Known limits and copyright",
+      "risk": "Risk control (BILI_RISK_CONTROL / -352 / -412 / -799) cannot be bypassed: degrade or retry later as the hint says, and never hammer the endpoint.",
+      "auth": "Personal-data tools return BILI_AUTH_REQUIRED while signed out; run bili_login with action=start or configure BILI_COOKIE.",
+      "rate": "The panel reads public endpoints only and may be briefly rate-limited; the Host keeps a 30-second memory cache, so wait before refreshing again.",
+      "download": "Downloads merge audio and video with ffmpeg; without ffmpeg only one stream is available, and paid or restricted content cannot be unlocked.",
+      "copyright": "Downloaded content is for personal offline study and backup only: do not redistribute it or use it commercially. Data comes from public Bilibili APIs; follow the Bilibili terms of service.",
+      "panel": "This page is read-only and cannot change configuration; every action runs through the bili_* tools. The panel never reads personal data."
+    },
+    "footer": "Tool and parameter contracts live in the repository's docs/INTERNAL-CONTRACT.md; installation, troubleshooting and verification status live in README."
+  },
+  "panel": {
+    "title": "Bilibili panel",
+    "close": "Close",
+    "refresh": "Refresh",
+    "loading": "Loading…",
+    "empty": "No data",
+    "retry": "Retry",
+    "error": "Failed to load",
+    "login": {
+      "loggedIn": "Signed in",
+      "loggedOut": "Signed out",
+      "hint": "The panel reads public data only; ask the agent to call bili_login with action=start to sign in."
+    },
+    "tab": {
+      "hot": "Trending",
+      "search": "Search",
+      "detail": "Details"
+    },
+    "hot": {
+      "title": "Bilibili trending",
+      "hint": "Click a trending keyword to search it.",
+      "empty": "No trending searches right now"
+    },
+    "search": {
+      "title": "Search videos",
+      "placeholder": "Type a keyword, e.g. game guide",
+      "submit": "Search",
+      "empty": "No search results"
+    },
+    "detail": {
+      "title": "Video details",
+      "placeholder": "Enter a BV id, e.g. BV1xx411c7mD",
+      "submit": "Open",
+      "empty": "No video selected yet: pick a search result or paste a BV id.",
+      "bvid": "BV id",
+      "play": "Open on Bilibili",
+      "duration": "Duration",
+      "published": "Published",
+      "owner": "Creator",
+      "parts": "Parts",
+      "views": "Views",
+      "invalidBvid": "Invalid BV id (BV followed by 10 characters)"
+    },
+    "footer": {
+      "copyright": "Data comes from public Bilibili APIs for personal browsing and research; follow the Bilibili terms of service.",
+      "routeOff": "The panel route is not registered (publicRoute=false), so this panel is unavailable."
+    }
+  }
+}

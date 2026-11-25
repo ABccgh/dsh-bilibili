@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="300" viewBox="0 0 640 300" role="img" aria-label="Bilibili tools: video details, search results and trending suggestions">
+  <!-- 视频播放卡：封面、播放三角与两条弹幕 -->
+  <rect x="48" y="56" width="280" height="148" rx="16" fill="#EAF6FC" stroke="#3E86A6" stroke-width="3"/>
+  <rect x="188" y="90" width="100" height="8" rx="4" fill="#8FCBE4"/>
+  <rect x="188" y="108" width="72" height="8" rx="4" fill="#8FCBE4"/>
+  <circle cx="132" cy="128" r="26" fill="#00AEEC"/>
+  <path d="M126 116 L148 128 L126 140 Z" fill="#EAF6FC"/>
+  <rect x="72" y="180" width="232" height="6" rx="3" fill="#BFDDEC"/>
+  <rect x="72" y="180" width="96" height="6" rx="3" fill="#3E86A6"/>
+  <circle cx="168" cy="183" r="6" fill="#00AEEC"/>
+  <!-- 搜索结果列表：缩略图 + 标题行 + 说明行 -->
+  <rect x="360" y="56" width="232" height="44" rx="10" fill="none" stroke="#3E86A6" stroke-width="2.4"/>
+  <rect x="372" y="66" width="32" height="24" rx="4" fill="#8FCBE4"/>
+  <rect x="414" y="68" width="120" height="6" rx="3" fill="#BFDDEC"/>
+  <rect x="414" y="82" width="84" height="6" rx="3" fill="#8FCBE4"/>
+  <rect x="360" y="112" width="232" height="44" rx="10" fill="none" stroke="#3E86A6" stroke-width="2.4"/>
+  <rect x="372" y="122" width="32" height="24" rx="4" fill="#8FCBE4"/>
+  <rect x="414" y="124" width="96" height="6" rx="3" fill="#BFDDEC"/>
+  <rect x="414" y="138" width="64" height="6" rx="3" fill="#8FCBE4"/>
+  <rect x="360" y="168" width="232" height="44" rx="10" fill="none" stroke="#3E86A6" stroke-width="2.4"/>
+  <rect x="372" y="178" width="32" height="24" rx="4" fill="#8FCBE4"/>
+  <rect x="414" y="180" width="132" height="6" rx="3" fill="#BFDDEC"/>
+  <rect x="414" y="194" width="72" height="6" rx="3" fill="#8FCBE4"/>
+  <!-- 搜索输入条：放大镜 + 占位条 -->
+  <rect x="48" y="236" width="544" height="32" rx="16" fill="#EAF6FC" stroke="#3E86A6" stroke-width="2.4"/>
+  <circle cx="76" cy="252" r="7" fill="none" stroke="#3E86A6" stroke-width="2.4"/>
+  <path d="M81 257 L87 263" stroke="#3E86A6" stroke-width="2.4" stroke-linecap="round"/>
+  <rect x="100" y="249" width="240" height="6" rx="3" fill="#BFDDEC"/>
+</svg>
