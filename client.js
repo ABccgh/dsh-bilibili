@@ -7,6 +7,26 @@ window.__ModuleLoader__.load({
     /** 客户端 locale 命名空间（与 locale/zh.json、locale/en.json 的 card/settings/panel 段一致）。 */
     const NS = 'bili';
 
+    /**
+     * 把嵌套词典拍平成点路径键。
+     *
+     * locale 运行时按 `dict[key]` 直接取值（`lib/client-locale` 的 lookup 不展开嵌套对象），
+     * 所以 `{ panel: { title } }` 必须注册成 `{ 'panel.title': '…' }`，否则 `t()` 会回退成键名。
+     * @param {Record<string, any>} source - 嵌套词典。
+     * @param {string} [prefix] - 键前缀。
+     * @returns {Record<string, string>} 扁平词典。
+     */
+    function flattenDict(source, prefix = '') {
+      /** @type {Record<string, string>} */
+      const out = {};
+      for (const [key, value] of Object.entries(source ?? {})) {
+        const path = prefix === '' ? key : `${prefix}.${key}`;
+        if (value !== null && typeof value === 'object' && !Array.isArray(value)) Object.assign(out, flattenDict(value, path));
+        else out[path] = String(value);
+      }
+      return out;
+    }
+
     /** 面板取数路由前缀（lib/route.js 注册，§11）。 */
     const PANEL_ROUTE = '/dsh-bilibili/api';
 
@@ -2622,7 +2642,7 @@ a.bili-hotword:hover, .bili-hotword-button:hover { background: var(--dsw-alias-i
       apply(ctx) {
         ctx.effect(() => {
           try {
-            return ctx.locale.register(NS, { zh: DICT.zh, en: DICT.en });
+            return ctx.locale.register(NS, { zh: flattenDict(DICT.zh), en: flattenDict(DICT.en) });
           } catch (error) {
             // 重复注册（例如 HMR 后旧 fiber 尚未卸载完）不应让整个插件激活失败。
             if (typeof console !== 'undefined' && typeof console.warn === 'function') {

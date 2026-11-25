@@ -77,6 +77,8 @@ export function createFakeCtx(options = {}) {
   const logger = options.logger ?? createFakeLogger();
   /** @type {Array<() => void>} */
   const disposers = [];
+  /** 等待服务出现才执行的 inject 回调。 */
+  const pendingInjections = [];
   const ctx = {
     logger,
     tools: {
@@ -104,8 +106,43 @@ export function createFakeCtx(options = {}) {
     get(name) {
       return services[name];
     },
+    /**
+     * Cordis 风格的服务注入：依赖齐了立刻执行，否则挂起等 `provide`。
+     * @param {string[]} names - 依赖的服务名。
+     * @param {Function} callback - 就绪回调。
+     * @returns {Function} 注销函数。
+     */
+    inject(names, callback) {
+      const entry = { names: [...names], callback };
+      if (entry.names.every((name) => services[name] !== undefined)) {
+        callback();
+        return () => {};
+      }
+      pendingInjections.push(entry);
+      return () => {
+        const index = pendingInjections.indexOf(entry);
+        if (index >= 0) pendingInjections.splice(index, 1);
+      };
+    },
   };
-  return { ctx, tools, services, logger, disposers };
+
+  /**
+   * 让一个服务「出现」，并触发所有依赖已满足的 inject 回调。
+   * @param {string} name - 服务名。
+   * @param {any} value - 服务实例。
+   * @returns {void}
+   */
+  function provide(name, value) {
+    services[name] = value;
+    for (const entry of [...pendingInjections]) {
+      if (!entry.names.every((dependency) => services[dependency] !== undefined)) continue;
+      const index = pendingInjections.indexOf(entry);
+      if (index >= 0) pendingInjections.splice(index, 1);
+      entry.callback();
+    }
+  }
+
+  return { ctx, tools, services, logger, disposers, provide, pendingInjections };
 }
 
 /**

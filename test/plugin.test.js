@@ -59,7 +59,24 @@ test('apply 注册 20 个工具、面板路由、技能与 3 个命令', async (
   assert.ok(disposers.length >= 24);
 });
 
-test('publicRoute=false 时不注册面板路由', async () => {
+test('webServer 晚于插件挂载时，inject 后补注册面板路由', async () => {
+  const fake = createFakeCtx({
+    credentials: createMemoryCredentials({}),
+    attachments: createMemoryAttachments(),
+    skills: { register: () => () => {} },
+    commands: { register: () => () => {} },
+  });
+  await apply(fake.ctx, {});
+  assert.equal(fake.tools.length, 20);
+
+  const webServer = createFakeWebServer();
+  fake.provide('webServer', webServer);
+  assert.equal(webServer.routes.length, 1);
+  assert.equal(webServer.routes[0].kind, 'prefix');
+  assert.equal(webServer.routes[0].path, PANEL_ROUTE);
+});
+
+test('publicRoute=false 时不注册面板路由，也不等待服务', async () => {
   const { webServer, tools } = await boot({ publicRoute: false });
   assert.equal(tools.length, 20);
   assert.equal(webServer.routes.length, 0);

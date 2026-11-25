@@ -304,6 +304,20 @@ test('client.js：apply 注册 10 张卡片 + 设置页 + 侧栏按钮 + 抽屉�
   assert.equal(localeRegisters[0].ns, 'bili');
   assert.ok(localeRegisters[0].dict.zh !== undefined && localeRegisters[0].dict.en !== undefined, '词典必须含 zh/en');
 
+  // locale 运行时按 dict[key] 直查：注册的词典必须是「扁平点路径」，嵌套对象会被忽略成键名。
+  const registeredZh = localeRegisters[0].dict.zh;
+  const registeredEn = localeRegisters[0].dict.en;
+  for (const [locale, dict] of [['zh', registeredZh], ['en', registeredEn]]) {
+    for (const [key, value] of Object.entries(dict)) {
+      assert.equal(typeof value, 'string', `${locale} 词典键 ${key} 必须是字符串（嵌套对象要拍平）`);
+    }
+  }
+  for (const key of ['panel.title', 'panel.tab.hot', 'settings.label', 'card.status.title', 'card.video.title']) {
+    assert.ok(registeredZh[key] !== undefined, `扁平键 ${key} 必须存在（否则界面显示原始键名）`);
+    assert.ok(registeredEn[key] !== undefined, `英文扁平键 ${key} 必须存在`);
+  }
+  assert.deepEqual(Object.keys(registeredZh).sort(), Object.keys(registeredEn).sort(), 'zh/en 扁平键集必须一致');
+
   // 源码层面确认 4 类注册调用都存在，且都用 slots.inject 等待声明。
   assert.equal((source.match(/ctx\.slots\.register\(/g) ?? []).length, 4, '应有 4 处 slots.register 调用');
   assert.equal((source.match(/ctx\.slots\.inject\(/g) ?? []).length, 4, '应有 4 处 slots.inject 调用');

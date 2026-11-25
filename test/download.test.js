@@ -556,6 +556,63 @@ test('download: audioOnly 的 quality 用音轨标签，而不是视频清晰度
   assert.ok(result.file.endsWith('.m4s'), '无 ffmpeg 时保留 DASH 原始分片');
 });
 
+test('download: 可用清晰度低于请求值时，quality 用真正选中的视频流标签', async (t) => {
+  const root = await makeDownloadRoot(t);
+  const api = createFakeApi({
+    resolveTarget: () => ({ bvid: BVID, aid: 1, page: 1, title: '虚标清晰度' }),
+    playurl: () => ({
+      ...dashPlay(),
+      quality: { id: 64, label: '高清 720P' },
+      video: [
+        { id: 32, label: '清晰 480P', width: 852, height: 480, url: VIDEO_720_URL },
+        { id: 16, label: '流畅 360P', width: 640, height: 360, url: VIDEO_1080_URL },
+      ],
+    }),
+  });
+  const http = createFakeHttp({
+    'v720.m4s': openRoute({ bytes: new Uint8Array(100) }),
+    'v1080.m4s': openRoute({ bytes: new Uint8Array(50) }),
+    'a192.m4s': openRoute({ bytes: new Uint8Array(20) }),
+  });
+  const fakeFfmpeg = createFakeFfmpeg(true);
+  const downloader = makeDownloader({ root, api, http, ffmpeg: fakeFfmpeg.probe, runFfmpeg: fakeFfmpeg.runFfmpeg });
+
+  const result = await downloader.run({ target: BVID, quality: '720' }, {});
+  assert.equal(result.merged, true);
+  assert.equal(result.quality, '清晰 480P', '应报实际选中的 480P，而不是请求的 720P');
+});
+
+test('download: 主地址 fetch 失败时用 backupUrls 重试（mcdn 不通的常见场景）', async (t) => {
+  const root = await makeDownloadRoot(t);
+  const api = createFakeApi({
+    resolveTarget: () => ({ bvid: BVID, aid: 1, page: 1, title: '主备地址' }),
+    playurl: () => ({
+      ...dashPlay(),
+      video: [{ id: 80, label: '1080P', url: 'https://cdn.test/dead-v.m4s', backupUrls: ['https://cdn.test/v1080.m4s'] }],
+      audio: [{ id: 30280, label: '192K', url: 'https://cdn.test/dead-a.m4s', backupUrls: ['https://cdn.test/a192.m4s'] }],
+    }),
+  });
+  const http = createFakeHttp({
+    'dead-v.m4s': () => {
+      throw new Error('fetch failed');
+    },
+    'dead-a.m4s': () => {
+      throw new Error('fetch failed');
+    },
+    'v1080.m4s': openRoute({ bytes: new Uint8Array(128) }),
+    'a192.m4s': openRoute({ bytes: new Uint8Array(32) }),
+  });
+  const fakeFfmpeg = createFakeFfmpeg(true);
+  const downloader = makeDownloader({ root, api, http, ffmpeg: fakeFfmpeg.probe, runFfmpeg: fakeFfmpeg.runFfmpeg });
+
+  const result = await downloader.run({ target: BVID }, {});
+  assert.equal(result.merged, true);
+  const urls = http.calls.map((call) => call.url);
+  assert.ok(urls.includes('https://cdn.test/dead-v.m4s'), '应先试主地址');
+  assert.ok(urls.includes('https://cdn.test/v1080.m4s'), '主地址失败后应换备用地址');
+  assert.ok(urls.includes('https://cdn.test/a192.m4s'), '音频也应走后备用地址');
+});
+
 test('download: page>1 时用 bvid 重建带 ?p= 的 target 传给 playurl', async (t) => {
   const root = await makeDownloadRoot(t);
   const api = createFakeApi({
