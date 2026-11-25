@@ -7,4 +7,4 @@ node_modules/
 _scratch/
 .admin/
 test/fixtures/*.bin
-!test/fixtures/dm-seg.bin
+!test/fixtures/t1-danmaku-seg.bin
