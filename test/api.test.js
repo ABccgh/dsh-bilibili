@@ -284,6 +284,48 @@ test('status：没有 ffmpeg 时不带 ffmpeg 字段；detect 抛错时归一成
   assert.equal(status.ffmpeg.error, '探测失败');
 });
 
+test('history：从 history.bvid / history.oid 生成链接，不再出现 av0', async () => {
+  const { api } = makeApi({
+    routes: {
+      'x/web-interface/history/cursor': {
+        code: 0,
+        data: {
+          list: [
+            {
+              title: '历史一<em>高亮</em>',
+              cover: '//i0.hdslb.com/bfs/archive/h1.jpg',
+              author_name: 'UP甲',
+              view_at: 1700000000,
+              progress: 30,
+              duration: 100,
+              history: { oid: 455017605, bvid: 'BV1Q541167Qg', page: 1 },
+            },
+            {
+              title: '历史二',
+              view_at: 1700000001,
+              progress: -1,
+              duration: 60,
+              history: { oid: 12345 },
+            },
+          ],
+          cursor: { max: 999 },
+        },
+      },
+    },
+  });
+  const result = await api.history({ limit: 5 });
+  assert.equal(result.items.length, 2);
+  assert.equal(result.items[0].title, '历史一高亮');
+  assert.equal(result.items[0].bvid, 'BV1Q541167Qg');
+  assert.equal(result.items[0].url, 'https://www.bilibili.com/video/BV1Q541167Qg');
+  assert.equal(result.items[0].author, 'UP甲');
+  assert.equal(result.items[0].progressSec, 30);
+  assert.match(result.items[1].url, /^https:\/\/www\.bilibili\.com\/video\/BV[0-9A-Za-z]{10}$/);
+  assert.equal(result.items[1].url.includes('av0'), false, '不应再出现 av0');
+  assert.equal(result.cursor, 999);
+  assert.equal(result.hasMore, false);
+});
+
 test('logout：清凭据并让 Cookie 罐失效', async () => {
   /** @type {Array<[string, string]>} */
   const calls = [];

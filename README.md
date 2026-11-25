@@ -2,7 +2,7 @@
 
 DeepSeek Harness 的 B 站（bilibili）全面接入插件：20 个 `bili_*` 工具 + 富卡片 + 设置页 + 侧栏「B 站」浏览面板 + `bilibili` 技能 + 「B 站内容研究」预设。
 
-> 状态：0.1.2。公开数据走 Host 侧 HTTP（Cookie 引导 + WBI/App 双签名），登录态通过扫码写入凭据 `BILI_COOKIE`；
+> 状态：0.1.3。公开数据走 Host 侧 HTTP（Cookie 引导 + WBI/App 双签名），登录态通过扫码写入凭据 `BILI_COOKIE`；
 > 下载支持 DASH（ffmpeg 无损合并，主地址失败自动换 backupUrls）与 durl 单文件兜底。
 
 ## 能力
