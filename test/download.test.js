@@ -540,6 +540,22 @@ test('download: api.playurl 的 quality 是 { id, label } 对象时返回 label'
   assert.equal(result.quality, '720P');
 });
 
+test('download: audioOnly 的 quality 用音轨标签，而不是视频清晰度', async (t) => {
+  const root = await makeDownloadRoot(t);
+  const api = createFakeApi({
+    resolveTarget: () => ({ bvid: BVID, aid: 1, page: 1, title: '纯音频' }),
+    playurl: () => dashPlay(),
+  });
+  const http = createFakeHttp({ 'a192.m4s': openRoute({ bytes: new Uint8Array(64) }) });
+  const fakeFfmpeg = createFakeFfmpeg(false);
+  const downloader = makeDownloader({ root, api, http, ffmpeg: fakeFfmpeg.probe, runFfmpeg: fakeFfmpeg.runFfmpeg });
+
+  const result = await downloader.run({ target: BVID, audioOnly: true }, {});
+  assert.equal(result.audioOnly, true);
+  assert.equal(result.quality, '音频 192K');
+  assert.ok(result.file.endsWith('.m4s'), '无 ffmpeg 时保留 DASH 原始分片');
+});
+
 test('download: page>1 时用 bvid 重建带 ?p= 的 target 传给 playurl', async (t) => {
   const root = await makeDownloadRoot(t);
   const api = createFakeApi({

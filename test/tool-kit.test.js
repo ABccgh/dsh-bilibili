@@ -95,6 +95,38 @@ test('defineTool 校验必填字段并保留回调', () => {
   assert.equal(definition.isConcurrencySafe(), false);
 });
 
+test('execute 把 BiliError 的 hint 拼进 message（工具错误只展示 message）', async () => {
+  const { BiliError } = await import('../lib/errors.js');
+  const definition = defineTool({
+    name: 'bili_hint_demo',
+    description: '演示',
+    output: { schema: { type: 'object', properties: { ok: { type: 'boolean' } } }, render: () => [] },
+    execute: async () => {
+      throw new BiliError('需要登录', { code: 'BILI_AUTH_REQUIRED', hint: '先 bili_login action=start' });
+    },
+  });
+  await assert.rejects(
+    () => definition.execute({}, {}),
+    (error) => error.message === '需要登录\n提示：先 bili_login action=start',
+  );
+});
+
+test('execute 不重复拼接已经包含提示的 message', async () => {
+  const { BiliError } = await import('../lib/errors.js');
+  const definition = defineTool({
+    name: 'bili_hint_demo2',
+    description: '演示',
+    output: { schema: { type: 'object', properties: { ok: { type: 'boolean' } } }, render: () => [] },
+    execute: async () => {
+      throw new BiliError('需要登录\n提示：已经带了', { hint: '不该重复' });
+    },
+  });
+  await assert.rejects(
+    () => definition.execute({}, {}),
+    (error) => error.message === '需要登录\n提示：已经带了',
+  );
+});
+
 test('renderResult 把 JSON 围栏放在最后一段', () => {
   const blocks = renderResult('人类文本', { ok: true, data: { a: 1 } }, [{ type: 'image', attachment: { attachmentId: 'x' } }]);
   assert.equal(blocks.length, 2);
