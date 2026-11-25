@@ -45,6 +45,23 @@ function qrFileFor(key) {
 }
 
 /**
+ * 让二维码副本落到临时目录（避免测试写用户真实的 Downloads），返回副本路径。
+ * @param {import('node:test').TestContext} t - 测试上下文。
+ * @returns {string} 持久化副本的绝对路径。
+ */
+function withQrDir(t) {
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'bili-qr-dir-'));
+  const previous = process.env.BILI_QR_DIR;
+  process.env.BILI_QR_DIR = directory;
+  t.after(() => {
+    if (previous === undefined) delete process.env.BILI_QR_DIR;
+    else process.env.BILI_QR_DIR = previous;
+    fs.rmSync(directory, { recursive: true, force: true });
+  });
+  return path.join(directory, 'bilibili-login-qr.png');
+}
+
+/**
  * 造一个临时清理钩子：删掉这些 qrcodeKey 对应的二维码 PNG。
  * @param {import('node:test').TestContext} t - 测试上下文。
  * @param {string[]} keys - qrcodeKey 列表。
@@ -350,6 +367,7 @@ test('bili_login: 只有一个工具，参数为 action(enum) + qrcodeKey，未�
 test('bili_login action=start：返回契约 data + 二维码图片附件，并删掉 %TEMP% 文件', async (t) => {
   const key = 't3-tool-start';
   cleanupQrFiles(t, [key]);
+  const saved = withQrDir(t);
   let attachedPath = '';
   const { deps } = makeToolDeps({
     apiOverrides: { loginStart: () => ({ qrcodeKey: key, url: LOGIN_URL, expiresInSec: 180 }) },
@@ -369,18 +387,20 @@ test('bili_login action=start：返回契约 data + 二维码图片附件，并�
   assert.equal(value.data.qrcodeKey, key);
   assert.equal(value.data.url, LOGIN_URL);
   assert.equal(value.data.expiresInSec, 180);
-  assert.deepEqual(value.data.qr, { attached: true });
+  assert.deepEqual(value.data.qr, { attached: true, file: saved });
   assert.equal(attachedPath, qrFileFor(key));
   assert.equal(fs.existsSync(attachedPath), false, '挂完附件后应删除临时文件');
+  assert.equal(fs.existsSync(saved), true, '应保留下载目录里的二维码副本');
   assert.equal(blocks[0].type, 'text');
   assert.equal(blocks[1].type, 'image', '图片块应追加在文本之后');
   assert.ok(text.includes('bili_login action=poll'), '文本应提示下一步 poll');
   assert.deepEqual(fenceOf(text), { ok: true, data: jsonRoundTrip(value.data) });
 });
 
-test('bili_login action=start：attachImages=false 时不落盘、不挂附件', async (t) => {
+test('bili_login action=start：attachImages=false 时不挂附件，但仍落盘二维码副本', async (t) => {
   const key = 't3-tool-start-noattach';
   cleanupQrFiles(t, [key]);
+  const saved = withQrDir(t);
   let attachCalls = 0;
   const { deps } = makeToolDeps({
     config: { attachImages: false },
@@ -395,16 +415,19 @@ test('bili_login action=start：attachImages=false 时不落盘、不挂附件',
   const [definition] = createLoginTools(deps);
   const { value, blocks, text } = await executeTool(definition, { action: 'start' });
 
-  assert.deepEqual(value.data.qr, { attached: false });
+  assert.deepEqual(value.data.qr, { attached: false, file: saved });
   assert.equal(attachCalls, 0, 'attachImages=false 时不该调用附件服务');
-  assert.equal(fs.existsSync(qrFileFor(key)), false, 'attachImages=false 时不应生成临时 PNG');
+  assert.equal(fs.existsSync(qrFileFor(key)), false, '临时 PNG 在持久化副本后应删除');
+  assert.equal(fs.existsSync(saved), true, '二维码副本应存在');
   assert.equal(blocks.filter((block) => block.type === 'image').length, 0);
-  assert.ok(text.includes(LOGIN_URL), '只返回 URL 文本');
+  assert.ok(text.includes('已保存到'), '文本应给出落盘路径');
+  assert.ok(text.includes(saved));
 });
 
-test('bili_login action=start：附件失败时降级为保留临时文件并给出路径', async (t) => {
+test('bili_login action=start：附件失败时降级为落盘副本并给出路径', async (t) => {
   const key = 't3-tool-start-fallback';
   cleanupQrFiles(t, [key]);
+  const saved = withQrDir(t);
   const { deps } = makeToolDeps({
     apiOverrides: { loginStart: () => ({ qrcodeKey: key, url: LOGIN_URL, expiresInSec: 180 }) },
     images: {
@@ -417,10 +440,10 @@ test('bili_login action=start：附件失败时降级为保留临时文件并给
   const { value, blocks, text } = await executeTool(definition, { action: 'start' });
 
   assert.equal(value.data.qr.attached, false);
-  assert.equal(value.data.qr.file, qrFileFor(key));
+  assert.equal(value.data.qr.file, saved);
   assert.equal(fs.existsSync(value.data.qr.file), true, '降级时应保留 PNG 供手动打开');
   assert.equal(blocks.filter((block) => block.type === 'image').length, 0);
-  assert.ok(text.includes(qrFileFor(key)));
+  assert.ok(text.includes(saved));
 });
 
 test('bili_login action=poll：成功后 data 形状正确、Cookie 写入凭据', async (t) => {

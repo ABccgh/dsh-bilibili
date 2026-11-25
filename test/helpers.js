@@ -191,6 +191,9 @@ export function createFakeHttp(routes = {}) {
     async getJson(url, options) {
       return run(url, options, 'json');
     },
+    async getJsonDetailed(url, options) {
+      return run(url, options, 'jsonDetailed');
+    },
     async getText(url, options) {
       return run(url, options, 'text');
     },
