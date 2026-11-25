@@ -266,7 +266,7 @@ test('client.js：vm 可解析、factory 返回 inject/apply 形状', () => {
   assert.match(source, /factory\(require\)\s*\{/, 'factory 必须声明 require 参数');
 });
 
-test('client.js：apply 注册 10 张卡片 + 设置页 + 侧栏按钮 + 抽屉浮层', () => {
+test('client.js：apply 注册 10 张卡片 + 设置页 + 导航图标 + 侧栏按钮 + 抽屉浮层', () => {
   const source = read('client.js');
   const plugin = loadPlugin(source);
   const { ctx, registrations, localeRegisters } = createFakeClientCtx();
@@ -288,6 +288,11 @@ test('client.js：apply 注册 10 张卡片 + 设置页 + 侧栏按钮 + 抽屉�
   assert.equal(settings[0].options.id, 'bilibili');
   assert.equal(settings[0].options.order, 60);
   assert.equal(typeof settings[0].component, 'function');
+
+  const sectionIcon = registrations.filter((entry) => entry.options.name === 'settings.section.icon');
+  assert.equal(sectionIcon.length, 1, '必须恰好注册 1 个设置导航图标');
+  assert.equal(sectionIcon[0].options.id, 'bilibili', '图标必须用 settings.section 的 id 匹配');
+  assert.equal(typeof sectionIcon[0].component, 'function');
 
   const footer = registrations.filter((entry) => entry.options.name === 'sidebar.footer.action');
   assert.equal(footer.length, 1, '必须恰好注册 1 个侧栏按钮');
@@ -318,14 +323,17 @@ test('client.js：apply 注册 10 张卡片 + 设置页 + 侧栏按钮 + 抽屉�
   }
   assert.deepEqual(Object.keys(registeredZh).sort(), Object.keys(registeredEn).sort(), 'zh/en 扁平键集必须一致');
 
-  // 源码层面确认 4 类注册调用都存在，且都用 slots.inject 等待声明。
-  assert.equal((source.match(/ctx\.slots\.register\(/g) ?? []).length, 4, '应有 4 处 slots.register 调用');
-  assert.equal((source.match(/ctx\.slots\.inject\(/g) ?? []).length, 4, '应有 4 处 slots.inject 调用');
-  for (const name of ['tool.call.toolview', 'settings.section', 'sidebar.footer.action', 'shell.overlay']) {
+  // 源码层面确认 5 类注册调用都存在，且都用 slots.inject 等待声明。
+  assert.equal((source.match(/ctx\.slots\.register\(/g) ?? []).length, 5, '应有 5 处 slots.register 调用');
+  assert.equal((source.match(/ctx\.slots\.inject\(/g) ?? []).length, 5, '应有 5 处 slots.inject 调用');
+  for (const name of ['tool.call.toolview', 'settings.section', 'settings.section.icon', 'sidebar.footer.action', 'shell.overlay']) {
     assert.ok(source.includes(`'${name}'`), `缺少 ${name} 注册调用`);
   }
   assert.match(source, /name:\s*'tool\.call\.toolview'/, '缺少 tool.call.toolview 注册');
   assert.match(source, /name:\s*'settings\.section'/, '缺少 settings.section 注册');
+  assert.match(source, /name:\s*'settings\.section\.icon'/, '缺少 settings.section.icon 注册');
+  assert.match(source, /glyph\('brand'/, '设置图标必须复用 brand 字形');
+  assert.equal(source.includes('M6.2 2.6 L4.8 13.4'), false, '热搜卡片不应再使用 # 字形');
   assert.match(source, /name:\s*'sidebar\.footer\.action'/, '缺少 sidebar.footer.action 注册');
   assert.match(source, /name:\s*'shell\.overlay'/, '缺少 shell.overlay 注册');
   assert.match(source, /ctx\.effect\(insertStyles/, '样式必须用 ctx.effect 管理清理');

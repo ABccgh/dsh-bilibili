@@ -1153,12 +1153,14 @@ window.__ModuleLoader__.load({
       if (name === 'popular') {
         return h('svg', common, h('path', { d: 'M2.4 11.6 L6.2 7.7 L9 10 L13.6 4.4' }), h('path', { d: 'M10.4 4.4 H13.6 V7.6' }));
       }
-      if (name === 'hotwords') {
+      // 品牌小方块（屏幕 + 播放三角 + 两条弹幕），同时也是「热搜」卡片的前导字形：
+      // 原来的 `#` 太像 Markdown 标题，用户不易识别。
+      if (name === 'brand' || name === 'hotwords') {
         return h('svg', common,
-          h('path', { d: 'M6.2 2.6 L4.8 13.4' }),
-          h('path', { d: 'M11.2 2.6 L9.8 13.4' }),
-          h('path', { d: 'M2.6 6.1 H13.4' }),
-          h('path', { d: 'M2.2 10 H13' }));
+          h('rect', { x: 1.8, y: 3.2, width: 12.4, height: 9.6, rx: 2 }),
+          h('path', { d: 'M3.8 5.5 H6.3' }),
+          h('path', { d: 'M3.8 7.3 H5.5' }),
+          h('path', { d: 'M8.1 6.3 L11.2 8 L8.1 9.7 Z', fill: 'currentColor', stroke: 'none' }));
       }
       if (name === 'comments') {
         return h('svg', common,
@@ -1193,6 +1195,21 @@ window.__ModuleLoader__.load({
     }
 
     // ---------------------------------------------------------------- 卡片外框
+
+    /**
+     * 设置页导航里的「B 站」图标。
+     *
+     * 宿主以 `settings.section.icon` 的 ownerProps（`size` / `active`）渲染，按 id 匹配到
+     * 我们的 `settings.section`；用 currentColor 跟随主题，不写死颜色。
+     * @param {{ size?: number, active?: boolean }} [props] - 宿主传入的尺寸与选中态。
+     * @returns {object} 图标元素。
+     */
+    function SectionIcon(props) {
+      const size = props !== null && typeof props === 'object' && Number.isFinite(Number(props.size))
+        ? Math.max(12, Math.trunc(Number(props.size)))
+        : 16;
+      return glyph('brand', size);
+    }
 
     /** 卡片外框：折叠行 + 展开体（外壳由宿主拥有，这里只补自己的块）。 */
     function CardFrame(props) {
@@ -2675,6 +2692,14 @@ a.bili-hotword:hover, .bili-hotword-button:hover { background: var(--dsw-alias-i
           // 导航标签由宿主按渲染时机解析 thunk，语言切换不需要重注册。
           label: () => t('settings.label'),
         }, SettingsSection));
+
+        // 设置导航里「B 站」那一行的图标：宿主按 settings.section 的 id 取。
+        ctx.slots.inject('settings.section.icon', () => ctx.slots.register({
+          name: 'settings.section.icon',
+          id: 'bilibili',
+          order: 60,
+          locale: NS,
+        }, SectionIcon));
 
         ctx.slots.inject('sidebar.footer.action', () => ctx.slots.register({
           name: 'sidebar.footer.action',
